@@ -26,7 +26,11 @@ const webpackHotMiddleware = require('koa-webpack-hot-middleware');
 * Vue.js development server middleware.
 */
 
+// http://stackoverflow.com/questions/35196380/webpack-hot-middleware-with-koa-2-0
+// "You can use koa-webpack-hot-middleware and wrap it with koa-convert"
+
 const compose = require('koa-compose'); 
+const convert = require('koa-convert');
 
 exports.devServer = function ({server, client, verbose=false}={}) {
   let clientConfig = Object.assign({}, client);
@@ -36,14 +40,14 @@ exports.devServer = function ({server, client, verbose=false}={}) {
   let serverBuilder = new VueBuilder(serverConfig);
 
   return compose([
-    webpackDevMiddleware(clientCompiler, {
+    convert(webpackDevMiddleware(clientCompiler, {
       noInfo: !verbose,
       publicPath: clientCompiler.options.output.publicPath
-    }),
-    webpackHotMiddleware(clientCompiler, {
+    })),
+    convert(webpackHotMiddleware(clientCompiler, {
       serverSideRender: false,
       historyApiFallback: true
-    }),
+    })),
     async (ctx, next) => {
       let source = await serverBuilder.compile();
       this.vue = new VueRender({source});
