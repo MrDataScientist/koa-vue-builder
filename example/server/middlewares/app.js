@@ -1,6 +1,22 @@
+// @TJ You can assign this.body to an SSE stream and then send data to
+// https://github.com/koajs/koa/issues/543
+
+// Koa streaming
+// stream-view: https://github.com/koajs/examples/tree/master/stream-view
+// stream-server-side-events : https://github.com/koajs/examples/blob/master/stream-server-side-events/app.js
+
+// ctx.vue.renderToStream()
+  // renderToStream ({ctx, cache}={}) {
+  //   let data = this.render.renderToStream(ctx); // Returns a Node.js readable stream.
+
+  //   data.once('data', (chunk) => data.emit('init', ctx));
+
+  //   return data;
+  // }
+
 exports.appRender = function() {
-  return (req, res) => {
-    let page = req.vue.renderToStream()
+  return (ctx, next) => {
+    var page = ctx.vue.renderToStream(ctx)
 
     res.write(`<!DOCTYPE html>`);
     page.on('init', () => {
@@ -23,7 +39,7 @@ exports.appRender = function() {
     });
     page.on('error', function (error) {
       console.error(error);
-      res.status(500).send('Server Error');
+      ctx.throw(500, 'Server Error');
     });
   }
 };

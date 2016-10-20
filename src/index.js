@@ -1,29 +1,32 @@
 const fs = require('fs');
 const webpack = require('webpack');
 const {VueBuilder, VueRender} = require('vue-builder');
-const webpackDevMiddleware = require('webpack-dev-middleware');
-const webpackHotMiddleware = require('webpack-hot-middleware');
+const webpackDevMiddleware = require('koa-webpack-dev-middleware');
+const webpackHotMiddleware = require('koa-webpack-hot-middleware');
+
+// require('babel-polyfill');
 
 /*
 * A function for merging middlewares into one.
 */
-
-function combine(mids) {
-  return mids.reduce(function(a, b) {
-    return function(req, res, next) {
-      a(req, res, function(err) {
-        if (err) {
-          return next(err);
-        }
-        b(req, res, next);
-      });
-    };
-  });
-}
+// function combine(mids) {
+//   return mids.reduce(function(a, b) {
+//     return function(req, res, next) {
+//       a(req, res, function(err) {
+//         if (err) {
+//           return next(err);
+//         }
+//         b(req, res, next);
+//       });
+//     };
+//   });
+// }
 
 /*
 * Vue.js development server middleware.
 */
+
+const compose = require('koa-compose'); 
 
 exports.devServer = function ({server, client, verbose=false}={}) {
   let clientConfig = Object.assign({}, client);
@@ -32,7 +35,7 @@ exports.devServer = function ({server, client, verbose=false}={}) {
   let clientCompiler = webpack(clientConfig);
   let serverBuilder = new VueBuilder(serverConfig);
 
-  return combine([
+  return compose([
     webpackDevMiddleware(clientCompiler, {
       noInfo: !verbose,
       publicPath: clientCompiler.options.output.publicPath
@@ -41,11 +44,10 @@ exports.devServer = function ({server, client, verbose=false}={}) {
       serverSideRender: false,
       historyApiFallback: true
     }),
-    (req, res, next) => {
-      serverBuilder.compile().then((source) => {
-        req.vue = new VueRender({source});
-        next();
-      });
+    async (ctx, next) => {
+      let source = await serverBuilder.compile();
+      this.vue = new VueRender({source});
+      // await next();
     }
   ]);
 }
@@ -58,8 +60,8 @@ exports.bundleRenderer = function ({bundlePath}={}) {
   let source = fs.readFileSync(bundlePath, 'utf8');
   let render = new VueRender({source});
 
-  return (req, res, next) => {
-    req.vue = render;
-    next();
+  return async (ctx, next) => {
+    this.vue = render;
+    // await next();
   };
 }
