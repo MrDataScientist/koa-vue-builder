@@ -1,31 +1,34 @@
 var Transform = require("stream").Transform
 
-module.exports = class HtmlWriter extends Transform { 
-  constructor(ctx, options = {}) {
-    super();
-    this.options = options;
-    // this.stream = ctx.vue.renderToStream(ctx);    
-    this.content = [];
+module.exports = class HtmlWriterStream extends Transform { 
+  constructor(options = {}) {
+    super(options);    
+    this.started = false;
   }
 
   get isHead() {
-    return this.content.length < 0;
+    return !this.started;
   }
 
   head() {
+    console.log('pushing head');
     this.push(`<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Example</title>
   <link href="/bundle.css" rel='stylesheet' type='text/css'>
-</head><body>`);    
+</head><body>`);
+
+    this.started = false;    
   }
 
   body(data) {
+    console.log('push:', data);    
     this.push(data.toString());
   }
 
   footer() {
+    console.log('push footer');    
     this.push(this._lastLineData)
     this.push(`<script src="/bundle.js"></script>
   </body>
@@ -36,6 +39,7 @@ module.exports = class HtmlWriter extends Transform {
   }
 
   _transform(chunk, encoding, done) {
+      console.log('transform', chunk.toString());    
       var data = chunk.toString()
       if (this._lastLineData) data = this._lastLineData + data
 
@@ -44,6 +48,7 @@ module.exports = class HtmlWriter extends Transform {
   }
 
   _flush(done) {
+      console.log('flush');    
       if (this._lastLineData) this.footer();
       this._lastLineData = null
       done()

@@ -3,6 +3,9 @@ const co = require('co');
 
 // See Node Streams guide: https://gist.github.com/joyrexus/10026630
 
+// Experiment, based on Koa examples: stream views
+// https://github.com/koajs/examples/tree/master/stream-view
+
 module.exports = class View extends Readable {
 
   constructor(context, stream) {
@@ -34,9 +37,6 @@ module.exports = class View extends Readable {
     console.log('wait body');
 
     // render the <body> on the next tick
-    await (chunk) => {
-      this.push(chunk);
-    };
     
     console.log('push body');
 

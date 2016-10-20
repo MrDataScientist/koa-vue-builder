@@ -6,10 +6,13 @@ const {vueDevServer, vueBundleRenderer} = require('./middlewares/vue');
 const isProduction = process.env.NODE_ENV === 'production';
 
 // const View = require('./view');
-const HtmlWriter = require('./transform');
+const HtmlWriterStream = require('./html-writer-stream');
+
+const router = require('koa-router')();
 
 exports.createServer = function (host, port, cb) {
   let app = new koa();
+
   console.log(`Listening on ${host}:${port} ...`);
 
   if (isProduction) {
@@ -22,16 +25,30 @@ exports.createServer = function (host, port, cb) {
   }
 
   // app.use(appRender());
+  console.log('configuring router');
 
-  app.use(function async (ctx) {
+  // See: https://github.com/alexmingoia/koa-router
+  router.get('/', async (ctx, next) => {
+    console.log('inside DEFAULT route /');
+
     this.type = 'html';
     let stream = ctx.vue.renderToStream();
-    let htmlWriter = new HtmlWriter(this);
+    let htmlWriter = new HtmlWriterStream(this);
+
+    console.log('piping html...');
     stream.pipe(htmlWriter).pipe(this.body);
+
+    console.log('await next...');
+    await next();
   });
 
+  console.log('configure routes with allowed methods');
 
-  console.log('middleware: appRender');
+  app
+    .use(router.routes())
+    .use(router.allowedMethods());  
+
+  console.log('middleware configured');
 
   return app.listen(port, host, cb);
 };
