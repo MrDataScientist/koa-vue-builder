@@ -13,7 +13,7 @@
   "scripts": {
     "test": "ava",
     "example:start": "babel-node ./example/scripts/start.js",
-    "example:build": "node ./example/scripts/build-client.js; node ./example/scripts/build-server.js"
+    "example:build": "babel-node ./example/scripts/build-client.js; babel-node ./example/scripts/build-server.js"
   },
   "repository": {
     "type": "git",

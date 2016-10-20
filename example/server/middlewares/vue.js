@@ -1,7 +1,9 @@
 const {build} = require('vue-webpack');
 const {devServer, bundleRenderer} = require('../../../src');
 
-exports.vueDevServer = function(ctx) {
+exports.vueDevServer = function(ctx, next) {
+  // console.log('vueDevServer');
+
   return devServer({
     server: build({
       env: 'development',
@@ -20,6 +22,8 @@ exports.vueDevServer = function(ctx) {
 };
 
 exports.vueBundleRenderer = function () {
+  // console.log('vueBundleRenderer');
+
   return bundleRenderer({
     bundlePath: `${__dirname}/../../../dist/server/bundle.js`
   });

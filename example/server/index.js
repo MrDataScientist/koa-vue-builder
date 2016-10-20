@@ -10,6 +10,14 @@ const HtmlWriterStream = require('./html-writer-stream');
 
 const router = require('koa-router')();
 
+// For use with renderToString
+// const Vue = require('vue');
+// const vm = new Vue({
+//   render (h) {
+//     return h('div', 'hello')
+//   }
+// })
+
 exports.createServer = function (host, port, cb) {
   let app = new koa();
 
@@ -17,38 +25,34 @@ exports.createServer = function (host, port, cb) {
 
   if (isProduction) {
     app.use(vueBundleRenderer());
-    console.log('middleware: vueBundleRenderer');
+    // console.log('middleware: vueBundleRenderer added');
   }
   else {
     app.use(vueDevServer());
-    console.log('middleware: vueDevServer');
+    // console.log('middleware: vueDevServer added');
   }
 
-  // app.use(appRender());
-  console.log('configuring router');
+  // See writing a streaming response
+  // http://stackoverflow.com/questions/28445382/writing-a-streaming-response-from-a-streaming-query-in-koa-with-mongoose
 
   // See: https://github.com/alexmingoia/koa-router
   router.get('/', async (ctx, next) => {
-    console.log('inside DEFAULT route /');
-
-    this.type = 'html';
-    let stream = ctx.vue.renderToStream();
-    let htmlWriter = new HtmlWriterStream(this);
-
-    console.log('piping html...');
-    stream.pipe(htmlWriter).pipe(this.body);
-
-    console.log('await next...');
+    ctx.type = 'html';
+    if (ctx.vue) {
+      let stream = ctx.vue.renderToStream();
+      let htmlWriter = new HtmlWriterStream();
+      ctx.body = stream.pipe(htmlWriter); 
+    } else {
+      console.log('no .vue object found on ctx. No SSR streaming possible :()');      
+    }
     await next();
   });
-
-  console.log('configure routes with allowed methods');
 
   app
     .use(router.routes())
     .use(router.allowedMethods());  
 
-  console.log('middleware configured');
+  // console.log('all middleware configured');
 
   return app.listen(port, host, cb);
 };

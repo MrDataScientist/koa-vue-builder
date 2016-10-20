@@ -30,7 +30,7 @@ const webpackHotMiddleware = require('koa-webpack-hot-middleware');
 // "You can use koa-webpack-hot-middleware and wrap it with koa-convert"
 
 const convert = require('koa-convert');
-const compose = convert.compose || require('koa-compose');
+const compose = convert.compose; // || require('koa-compose');
 
 // Convert koa legacy ( 0.x & 1.x ) generator middleware to modern promise middleware ( 2.x ).
 
@@ -51,9 +51,10 @@ exports.devServer = function ({server, client, verbose=false}={}) {
       historyApiFallback: true
     })),
     async (ctx, next) => {
+      console.log('devServer: add VueRender to .vue on ctx');
       let source = await serverBuilder.compile();
-      this.vue = new VueRender({source});
-      // await next();
+      ctx.vue = new VueRender({source});
+      await next();
     }
   ]);
 }
@@ -67,7 +68,8 @@ exports.bundleRenderer = function ({bundlePath}={}) {
   let render = new VueRender({source});
 
   return async (ctx, next) => {
-    this.vue = render;
-    // await next();
+    console.log('bundleRenderer: add VueRender to .vue on ctx');
+    ctx.vue = render;
+    await next();
   };
 }
