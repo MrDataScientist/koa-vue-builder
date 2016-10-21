@@ -1,22 +1,8 @@
 const koa = require('koa');
 const {vueDevServer, vueBundleRenderer} = require('./middlewares/vue');
-
-// const {appRender} = require('./middlewares/app');
-
 const isProduction = process.env.NODE_ENV === 'production';
-
-// const View = require('./view');
 const HtmlWriterStream = require('./html-writer-stream');
-
 const router = require('koa-router')();
-
-// For use with renderToString
-// const Vue = require('vue');
-// const vm = new Vue({
-//   render (h) {
-//     return h('div', 'hello')
-//   }
-// })
 
 exports.createServer = function (host, port, cb) {
   let app = new koa();

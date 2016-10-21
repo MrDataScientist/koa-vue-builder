@@ -1,26 +1,9 @@
+const path = require('path');
 const fs = require('fs');
 const webpack = require('webpack');
 const {VueBuilder, VueRender} = require('vue-builder');
 const webpackDevMiddleware = require('koa-webpack-dev-middleware');
 const webpackHotMiddleware = require('koa-webpack-hot-middleware');
-
-// require('babel-polyfill');
-
-/*
-* A function for merging middlewares into one.
-*/
-// function combine(mids) {
-//   return mids.reduce(function(a, b) {
-//     return function(req, res, next) {
-//       a(req, res, function(err) {
-//         if (err) {
-//           return next(err);
-//         }
-//         b(req, res, next);
-//       });
-//     };
-//   });
-// }
 
 /*
 * Vue.js development server middleware.
@@ -51,9 +34,9 @@ exports.devServer = function ({server, client, verbose=false}={}) {
       historyApiFallback: true
     })),
     async (ctx, next) => {
-      console.log('devServer: add VueRender to .vue on ctx');
+      // console.log('devServer: add VueRender to .vue on ctx');
       let source = await serverBuilder.compile();
-      ctx.vue = new VueRender({source});
+      ctx.vue = new VueRender(source);
       await next();
     }
   ]);
@@ -63,9 +46,9 @@ exports.devServer = function ({server, client, verbose=false}={}) {
 * Vue.js rendering utils middleware.
 */
 
-exports.bundleRenderer = function ({bundlePath}={}) {
-  let source = fs.readFileSync(bundlePath, 'utf8');
-  let render = new VueRender({source});
+exports.bundleRenderer = function (bundlePath, options = {}) {
+  let source = fs.readFileSync(path.resolve(bundlePath), 'utf8');
+  let render = new VueRender(source, options);
 
   return async (ctx, next) => {
     console.log('bundleRenderer: add VueRender to .vue on ctx');
