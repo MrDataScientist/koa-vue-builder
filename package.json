@@ -1,7 +1,7 @@
 {
-  "name": "express-vue-builder",
-  "version": "1.0.0",
-  "description": "Vue.js server-side and client-side rendering middleware for Express.js.",
+  "name": "koa-vue-builder",
+  "version": "0.9.0",
+  "description": "Vue.js server-side and client-side rendering middleware for Koa.js",
   "main": "./src/index.js",
   "ava": {
     "files": [
@@ -17,14 +17,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xpepermint/express-vue-builder.git"
+    "url": "git+https://github.com/kristianmandrup/koa-vue-builder.git"
   },
   "bugs": {
-    "url": "https://github.com/xpepermint/express-vue-builder/issues"
+    "url": "https://github.com/kristianmandrup/koa-vue-builder/issues"
   },
-  "homepage": "https://github.com/xpepermint/express-vue-builder#readme",
+  "homepage": "https://github.com/kristianmandrup/koa-vue-builder#readme",
   "keywords": [
-    "express",
+    "koa",
     "connect",
     "vue",
     "webpack",
@@ -41,7 +41,7 @@
     "compiler",
     "dev-server"
   ],
-  "author": "Kristijan Sedlak (Xpepermint)",
+  "author": "Kristian Mandrup",
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.16.0",
