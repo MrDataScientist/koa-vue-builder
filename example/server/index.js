@@ -1,24 +1,17 @@
 const koa = require('koa');
-const {vueDevServer, vueBundleRenderer} = require('./middlewares/vue');
-const isProduction = process.env.NODE_ENV === 'production';
-const HtmlWriterStream = require('./html-writer-stream');
 const router = require('koa-router')();
+
+const { vueBundleRenderer } = require('./middlewares/vue');
+const HtmlWriterStream = require('./html-writer-stream');
 
 exports.createServer = function (host, port, cb) {
   let app = new koa();
 
   console.log(`Listening on ${host}:${port} ...`);
 
-  if (isProduction) {
-    app.use(vueBundleRenderer());
-    // console.log('middleware: vueBundleRenderer added');
-  }
-  else {
-    app.use(vueDevServer());
-    // console.log('middleware: vueDevServer added');
-  }
+  app.use(vueBundleRenderer());
 
-  // See writing a streaming response
+  // Writing a streaming response
   // http://stackoverflow.com/questions/28445382/writing-a-streaming-response-from-a-streaming-query-in-koa-with-mongoose
 
   // See: https://github.com/alexmingoia/koa-router
@@ -37,8 +30,6 @@ exports.createServer = function (host, port, cb) {
   app
     .use(router.routes())
     .use(router.allowedMethods());  
-
-  // console.log('all middleware configured');
 
   return app.listen(port, host, cb);
 };

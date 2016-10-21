@@ -72,7 +72,6 @@
   "dependencies": {
     "babel-plugin-transform-async-to-generator": "^6.16.0",
     "babel-polyfill": "^6.16.0",
-    "co": "^4.6.0",
     "koa": "^2.0.0-alpha.7",
     "koa-compose": "^2.4.0",
     "koa-convert": "^1.2.0",

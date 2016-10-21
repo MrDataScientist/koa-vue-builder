@@ -1,8 +1,8 @@
 var Transform = require("stream").Transform
 
-module.exports = class HtmlWriterStream extends Transform { 
+module.exports = class HtmlWriterStream extends Transform {
   constructor(options = {}) {
-    super(options);    
+    super(options);
     this.started = false;
   }
 
@@ -11,7 +11,6 @@ module.exports = class HtmlWriterStream extends Transform {
   }
 
   head(data) {
-    // console.log('push head');
     this.push(`<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="utf-8">
@@ -19,16 +18,14 @@ module.exports = class HtmlWriterStream extends Transform {
   <link href="/bundle.css" rel='stylesheet' type='text/css'>
 </head><body>${data}`);
 
-    this.started = false;    
+    this.started = false;
   }
 
   body(data) {
-    // console.log('push body:', data);    
     this.push(data.toString());
   }
 
   footer() {
-    // console.log('push footer');    
     this.push(`<script src="/bundle.js"></script>
   </body>
 </html>`);
@@ -39,15 +36,13 @@ module.exports = class HtmlWriterStream extends Transform {
 
   _transform(chunk, encoding, done) {
       var data = chunk.toString()
-      // console.log('transform chunk', data);
       this.isHead ? this.head(data) : this.body(data);
       done();
   }
 
   _flush(done) {
-      // console.log('flush');     
       this.footer();
       this._lastLineData = null
       done();
-  }  
+  }
 }

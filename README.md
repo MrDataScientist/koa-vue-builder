@@ -32,7 +32,7 @@ Before we deploy application in production, we need to compile our Vue.js applic
 Once you've created the bundle file for server-side, you can create a middleware.
 
 ```js
-const {bundleRenderer} = require('express-vue-builder');
+const {bundleRenderer} = require('koa-vue-builder');
 
 let middleware = bundleRenderer(`./dist/server/bundle.js`); // pass this to app.use() of your Koa application (see example below)
 ```
@@ -65,42 +65,16 @@ router.get('/', async (ctx, next) => {
   if (ctx.vue) {
     let stream = ctx.vue.renderToStream();
     let htmlWriter = new HtmlWriterStream();
-    ctx.body = stream.pipe(htmlWriter); 
+    ctx.body = stream.pipe(htmlWriter);
   } else {
-    console.log('no .vue object found on ctx. No SSR streaming possible :()');      
+    console.log('no .vue object found on ctx. No SSR streaming possible :()');
   }
   await next();
 });
 
 app
   .use(router.routes())
-  .use(router.allowedMethods());  
-```
-
-### Webpack middleware
-
-Uses Koa specific webpack middleware:
-
-- [koa-webpack-dev-middleware](https://www.npmjs.com/package/koa-webpack-dev-middleware)
-- [koa-webpack-hot-middleware](https://www.npmjs.com/package/koa-webpack-hot-middleware)
-
-The middlewares are wrapped using `convert` and `compose` in order to work with Koa2 async/await promises:
-
-```js
-const convert = require('koa-convert');
-const compose = convert.compose;
-
-// ...
-
-return compose([
-  convert(webpackDevMiddleware(clientCompiler, {
-    //...
-  }),
-  convert(webpackHotMiddleware(clientCompiler, {
-    //...
-  }
-  //...
-]);    
+  .use(router.allowedMethods());
 ```
 
 ## TODO: Add more Koa Adapters
